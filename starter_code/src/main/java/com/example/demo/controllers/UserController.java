@@ -48,8 +48,7 @@ public class UserController {
 		User user = new User();
 		user.setUsername(createUserRequest.getUsername());
 		Cart cart = new Cart();
-		cartRepository.save(cart);
-		user.setCart(cart);
+
 
 		if( createUserRequest.getPassword().length() < 6 || !createUserRequest.getPassword().equals(createUserRequest.getConfirmPassword())){
 			return ResponseEntity.badRequest().build();
@@ -57,6 +56,8 @@ public class UserController {
 
 		user.setPassword(bCryptPasswordEncoder.encode(createUserRequest.getPassword()));
 
+		cartRepository.save(cart);
+		user.setCart(cart);
 		userRepository.save(user);
 		return ResponseEntity.ok(user);
 	}
