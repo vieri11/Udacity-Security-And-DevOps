@@ -48,12 +48,11 @@ public class UserController {
 	public ResponseEntity<User> createUser(@RequestBody CreateUserRequest createUserRequest) {
 		User user = new User();
 		user.setUsername(createUserRequest.getUsername());
-
-		log.info("User name set with " + createUserRequest.getUsername());
-
 		Cart cart = new Cart();
 
 		if( createUserRequest.getPassword().length() < 6 || !createUserRequest.getPassword().equals(createUserRequest.getConfirmPassword())){
+			log.error("User {}, invalid password. Password must be at least 6 characters long and must match confirm password",
+					createUserRequest.getUsername());
 			return ResponseEntity.badRequest().build();
 		}
 
@@ -62,6 +61,9 @@ public class UserController {
 		cartRepository.save(cart);
 		user.setCart(cart);
 		userRepository.save(user);
+		
+		log.info("User {} created successfully ", createUserRequest.getUsername());
+
 		return ResponseEntity.ok(user);
 	}
 	
