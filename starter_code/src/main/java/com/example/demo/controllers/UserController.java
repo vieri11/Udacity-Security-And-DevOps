@@ -51,17 +51,24 @@ public class UserController {
 		Cart cart = new Cart();
 
 		if( createUserRequest.getPassword().length() < 6 || !createUserRequest.getPassword().equals(createUserRequest.getConfirmPassword())){
-			log.error("User {}, invalid password. Password must be at least 6 characters long and must match confirm password",
+			log.error("Error! User {}, invalid password. Password must be at least 6 characters long and must match confirm password",
 					createUserRequest.getUsername());
 			return ResponseEntity.badRequest().build();
 		}
 
 		user.setPassword(bCryptPasswordEncoder.encode(createUserRequest.getPassword()));
 
+		User userDup = userRepository.findByUsername(createUserRequest.getUsername());
+
+		if(userDup != null) {
+			log.error("Error! User {} cannot be created", createUserRequest.getUsername());
+			return ResponseEntity.badRequest().build();
+		}
+
 		cartRepository.save(cart);
 		user.setCart(cart);
 		userRepository.save(user);
-		
+
 		log.info("User {} created successfully ", createUserRequest.getUsername());
 
 		return ResponseEntity.ok(user);
